@@ -20,7 +20,7 @@ import Layout from '@layouts/Layout.astro';
 </Layout>
 
 <script>
-  const form = document.getElementById('login-form');
+  const form = document.getElementById('login-form') as HTMLFormElement | null;
   const error = document.getElementById('error');
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
