@@ -1,11 +1,14 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { currentUser } from '@lib/auth';
-import { query } from '@lib/db';
+import { readDatabase } from '@lib/blob-db';
 
 const user = await currentUser(Astro.cookies);
 if (!user) return Astro.redirect('/login');
-const bleus = await query<any[]>(`SELECT id, Nom, Prenom, Tel, Regio, Sexe, DateN, Supp FROM bleus ORDER BY Nom, Prenom`);
+const database = await readDatabase();
+const bleus = [...database.bleus].sort((a, b) =>
+  `${a.Nom} ${a.Prenom}`.localeCompare(`${b.Nom} ${b.Prenom}`, 'fr')
+);
 ---
 <Layout title="Bleus">
   <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -22,7 +25,7 @@ const bleus = await query<any[]>(`SELECT id, Nom, Prenom, Tel, Regio, Sexe, Date
       <div class="mt-3 flex gap-4 text-xs text-slate-500"><span>{bleu.Sexe}</span><span>{bleu.DateN}</span></div>
     </article>)}
   </div>
-  <p id="empty" class="hidden py-12 text-center text-slate-500">Aucun résultat.</p>
+  <p id="empty" class:list={['py-12 text-center text-slate-500', bleus.length ? 'hidden' : '']}>Aucun résultat.</p>
 </Layout>
 
 <script>

@@ -1,13 +1,13 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { currentUser } from '@lib/auth';
-import { query } from '@lib/db';
+import { readDatabase } from '@lib/blob-db';
 
 const user = await currentUser(Astro.cookies);
 if (!user) return Astro.redirect('/login');
-const totals = await query<any[]>('SELECT COUNT(*) AS total, SUM(Supp = 0) AS actifs FROM bleus');
-const total = Number(totals[0]?.total || 0);
-const actifs = Number(totals[0]?.actifs || 0);
+const database = await readDatabase();
+const total = database.bleus.length;
+const actifs = database.bleus.filter((bleu) => !bleu.Supp).length;
 ---
 <Layout title="Accueil">
   <section class="mb-6">
