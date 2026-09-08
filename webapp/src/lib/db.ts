@@ -18,6 +18,6 @@ export function db() {
 }
 
 export async function query<T = any[]>(sql: string, params: Record<string, unknown> = {}) {
-  const [rows] = await db().execute(sql, params);
+  const [rows] = await db().execute(sql, params as any);
   return rows as T;
 }
