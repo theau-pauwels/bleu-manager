@@ -1,0 +1,42 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { currentUser } from '@lib/auth';
+import { query } from '@lib/db';
+
+const user = await currentUser(Astro.cookies);
+if (!user) return Astro.redirect('/login');
+const bleus = await query<any[]>(`SELECT id, Nom, Prenom, Tel, Regio, Sexe, DateN, Supp FROM bleus ORDER BY Nom, Prenom`);
+---
+<Layout title="Bleus">
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div><p class="text-sm font-semibold text-redcross-500">Listing</p><h1 class="text-3xl font-bold">Bleus</h1></div>
+    <input id="search" type="search" placeholder="Rechercher nom, prénom, régionale…" class="field sm:max-w-sm" />
+  </div>
+
+  <div id="list" class="grid gap-3">
+    {bleus.map((bleu) => <article class="bleu card p-4" data-search={`${bleu.Nom} ${bleu.Prenom} ${bleu.Regio} ${bleu.Tel}`.toLowerCase()}>
+      <div class="flex items-start justify-between gap-3">
+        <div><h2 class="font-bold">{bleu.Prenom} {bleu.Nom}</h2><p class="mt-1 text-sm text-slate-500">{bleu.Regio} · {bleu.Tel || 'Pas de téléphone'}</p></div>
+        <span class:list={['rounded-full px-2.5 py-1 text-xs font-semibold', bleu.Supp ? 'bg-slate-100 text-slate-500' : 'bg-emerald-50 text-emerald-700']}>{bleu.Supp ? 'Supprimé' : 'Actif'}</span>
+      </div>
+      <div class="mt-3 flex gap-4 text-xs text-slate-500"><span>{bleu.Sexe}</span><span>{bleu.DateN}</span></div>
+    </article>)}
+  </div>
+  <p id="empty" class="hidden py-12 text-center text-slate-500">Aucun résultat.</p>
+</Layout>
+
+<script>
+  const input = document.getElementById('search');
+  const cards = [...document.querySelectorAll('.bleu')];
+  const empty = document.getElementById('empty');
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    cards.forEach((card) => {
+      const show = (card.getAttribute('data-search') || '').includes(q);
+      card.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    empty?.classList.toggle('hidden', visible !== 0);
+  });
+</script>

@@ -1,0 +1,44 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { currentUser } from '@lib/auth';
+const user = await currentUser(Astro.cookies);
+if (!user) return Astro.redirect('/login');
+if (user.role !== 'ADMIN') return Astro.redirect('/');
+---
+<Layout title="Utilisateurs">
+  <div class="mb-6"><p class="text-sm font-semibold text-redcross-500">Administration</p><h1 class="text-3xl font-bold">Chef flics</h1></div>
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <section class="card overflow-hidden"><div class="border-b border-slate-200 p-4 font-bold">Comptes</div><div id="users" class="divide-y divide-slate-100"></div></section>
+    <section class="card p-5"><h2 class="text-lg font-bold">Créer un Chef flics</h2>
+      <form id="create-user" class="mt-4 space-y-3">
+        <input class="field" name="displayName" placeholder="Nom affiché" required />
+        <input class="field" name="username" placeholder="Identifiant" autocomplete="off" required />
+        <input class="field" name="password" type="password" minlength="10" placeholder="Mot de passe (10 caractères min.)" required />
+        <p id="message" class="hidden rounded-xl p-3 text-sm"></p>
+        <button class="btn-primary w-full">Créer le compte</button>
+      </form>
+    </section>
+  </div>
+</Layout>
+<script>
+  const container = document.getElementById('users');
+  const form = document.getElementById('create-user');
+  const message = document.getElementById('message');
+  async function load() {
+    const response = await fetch('/api/admin/users');
+    if (!response.ok) return;
+    const users = await response.json();
+    if (container) container.innerHTML = users.map((u) => `<div class="flex items-center justify-between gap-3 p-4"><div><strong>${u.displayName}</strong><div class="text-sm text-slate-500">${u.username}</div></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold">${u.role === 'ADMIN' ? 'Administrateur' : 'Chef flics'}</span></div>`).join('');
+  }
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const payload = Object.fromEntries(new FormData(form).entries());
+    const response = await fetch('/api/admin/users', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+    if (message) {
+      message.textContent = response.ok ? 'Compte créé.' : (await response.json().catch(() => ({error:'Erreur'}))).error;
+      message.className = response.ok ? 'rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700' : 'rounded-xl bg-redcross-50 p-3 text-sm text-redcross-700';
+    }
+    if (response.ok) { form.reset(); await load(); }
+  });
+  load();
+</script>

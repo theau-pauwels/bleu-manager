@@ -1,0 +1,29 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { currentUser } from '@lib/auth';
+import { query } from '@lib/db';
+
+const user = await currentUser(Astro.cookies);
+if (!user) return Astro.redirect('/login');
+const totals = await query<any[]>('SELECT COUNT(*) AS total, SUM(Supp = 0) AS actifs FROM bleus');
+const total = Number(totals[0]?.total || 0);
+const actifs = Number(totals[0]?.actifs || 0);
+---
+<Layout title="Accueil">
+  <section class="mb-6">
+    <p class="text-sm font-semibold text-redcross-500">Bonjour {user.displayName}</p>
+    <h1 class="mt-1 text-3xl font-bold">Tableau de bord</h1>
+    <p class="mt-2 text-slate-500">Une interface web mobile-first, sans application à installer.</p>
+  </section>
+
+  <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <article class="card p-5"><p class="text-sm text-slate-500">Bleus enregistrés</p><p class="mt-2 text-3xl font-bold">{total}</p></article>
+    <article class="card p-5"><p class="text-sm text-slate-500">Fiches actives</p><p class="mt-2 text-3xl font-bold">{actifs}</p></article>
+    <a href="/api/export.xlsx" class="card p-5 transition hover:border-redcross-500"><p class="text-sm text-slate-500">Export</p><p class="mt-2 text-lg font-bold text-redcross-500">Télécharger Excel →</p></a>
+  </section>
+
+  <section class="mt-7 grid gap-4 md:grid-cols-2">
+    <a href="/bleus" class="card p-6 transition hover:border-redcross-500"><h2 class="text-xl font-bold">Consulter les bleus</h2><p class="mt-2 text-sm text-slate-500">Recherche rapide, téléphone, régionale et informations de contact.</p></a>
+    {user.role === 'ADMIN' && <a href="/admin/users" class="card p-6 transition hover:border-redcross-500"><h2 class="text-xl font-bold">Gérer les Chef flics</h2><p class="mt-2 text-sm text-slate-500">Créer et consulter les comptes autorisés à utiliser Bleu Manager.</p></a>}
+  </section>
+</Layout>

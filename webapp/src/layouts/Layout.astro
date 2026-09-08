@@ -1,0 +1,23 @@
+---
+import Nav from '@components/Nav.astro';
+import '@styles/base.css';
+
+interface Props { title: string; protected?: boolean; }
+const { title, protected: mustAuth = true } = Astro.props;
+---
+<!doctype html>
+<html lang="fr-BE">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#E21224" />
+    <meta name="description" content="Bleu Manager — gestion mobile des bleus" />
+    <title>{title} | Bleu Manager</title>
+  </head>
+  <body>
+    {mustAuth && <Nav />}
+    <main class="container mx-auto px-4 pb-24 pt-5 lg:pb-10 lg:pt-8">
+      <slot />
+    </main>
+  </body>
+</html>

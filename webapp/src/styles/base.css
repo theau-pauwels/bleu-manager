@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { @apply bg-slate-50 text-slate-900; }
+  body { @apply min-h-screen font-sans antialiased; }
+  h1, h2, h3, h4 { @apply text-balance; }
+  p { @apply text-pretty; }
+  button, a, input, select { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer components {
+  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-box; }
+  .btn-primary { @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-redcross-500 px-4 py-2.5 font-semibold text-white transition hover:bg-redcross-600 focus:outline-none focus:ring-2 focus:ring-redcross-500 focus:ring-offset-2; }
+  .btn-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 font-semibold text-slate-800 transition hover:bg-slate-50; }
+  .field { @apply min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none transition focus:border-redcross-500 focus:ring-2 focus:ring-redcross-100; }
+}
