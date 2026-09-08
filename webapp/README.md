@@ -13,7 +13,7 @@ Refonte web mobile-first basée sur la stack du site `carte-fede` : Astro + Tail
 - Webhook Google Forms compatible avec les clés historiques (`nom`, `prenom`, `sexe`, `adresse`, `daten`, `regio`, `resplegal`, `numresplegal`, `tel`).
 - Requêtes SQL paramétrées et mots de passe hashés avec bcrypt.
 
-## Installation
+## Installation locale
 
 ```bash
 cd webapp
@@ -26,6 +26,21 @@ npm run dev
 L'administrateur initial n'est jamais stocké en clair dans Git. S'il n'existe encore aucun compte `ADMIN`, le premier appel de connexion crée le compte défini par `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_PASSWORD` et `BOOTSTRAP_ADMIN_NAME`.
 
 Après la première connexion, remplacez/supprimez `BOOTSTRAP_ADMIN_PASSWORD` de l'environnement de production.
+
+## Déploiement Vercel
+
+Le dépôt contient également l'ancienne application Flutter : le projet Astro n'est donc pas situé à la racine Git.
+
+Dans **Vercel > Project > Settings > Build and Deployment** :
+
+- **Root Directory** : `webapp`
+- **Framework Preset** : `Astro`
+- **Build Command** : laisser la valeur par défaut (`npm run build`)
+- **Install Command** : laisser la valeur par défaut (`npm install`)
+
+Ajouter ensuite les variables de `.env.example` dans **Settings > Environment Variables**. Ne jamais ajouter un vrai fichier `.env` au dépôt.
+
+La webapp utilise l'adaptateur officiel `@astrojs/vercel` en rendu serveur, car l'authentification, l'export Excel et les endpoints API nécessitent du SSR.
 
 ## Google Forms
 
