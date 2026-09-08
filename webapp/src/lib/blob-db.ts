@@ -78,6 +78,8 @@ function normalizeDatabase(value: Partial<BlobDatabase>): BlobDatabase {
 export async function readDatabase(): Promise<BlobDatabase> {
   try {
     const result = await get(pathname, { access: 'private', useCache: false });
+    if (!result) return emptyDatabase();
+
     const data = await new Response(result.stream).json() as Partial<BlobDatabase>;
     return normalizeDatabase(data);
   } catch (error: unknown) {
