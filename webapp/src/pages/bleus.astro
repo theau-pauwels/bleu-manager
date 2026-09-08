@@ -26,8 +26,8 @@ const bleus = await query<any[]>(`SELECT id, Nom, Prenom, Tel, Regio, Sexe, Date
 </Layout>
 
 <script>
-  const input = document.getElementById('search');
-  const cards = [...document.querySelectorAll('.bleu')];
+  const input = document.getElementById('search') as HTMLInputElement | null;
+  const cards = [...document.querySelectorAll<HTMLElement>('.bleu')];
   const empty = document.getElementById('empty');
   input?.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
